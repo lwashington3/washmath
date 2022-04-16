@@ -1,0 +1,9 @@
+.idea
+.ipynb_checkpoints
+.old_git
+washmath/assertion_tests.ipynb
+washmath/winvenv
+__pycache__
+washmath/stats/t table.pdf
+washmath/stats/Ztable.pdf
+washmath/stats/t.csv

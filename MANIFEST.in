@@ -1,0 +1,3 @@
+recursive-include washmath/c_libs *.so
+recursive-include washmath/c_libs *.so.*
+recursive-include washmath/c_libs *.dll
