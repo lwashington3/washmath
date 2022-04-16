@@ -11,7 +11,7 @@ git_url = "https://github.com/lwashington3/washmath"
 
 setup(
 	name=project_name,
-	version="1.0.0",
+	version="1.0.1",
 	author="Len Washington III",
 	author_email="l.washingtoniii.27@gmail.com",
 	description="Custom mathematics module",
@@ -24,5 +24,5 @@ setup(
 	},
 	license="MIT",
 	packages=[project_name],
-	install_requires=["matplotlib", "numpy", "pandas", "git+https://github.com/lwashington3/colors.git"]
+	install_requires=["matplotlib", "numpy", "pandas", "colors @ git+https://github.com/lwashington3/colors.git"]
 )
