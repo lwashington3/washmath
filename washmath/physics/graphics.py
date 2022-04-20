@@ -1,12 +1,15 @@
+from ..tools import superscript
+from ..stats.statlist import StatList
+from ..stats.lsr import Least_Squares_Regression as LSR
+from colors import Color, Colors, convert_color
+from io import StringIO
+from re import sub
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from colors import Color, Colors, convert_color
-from ..stats.statlist import StatList
-from ..stats.lsr import Least_Squares_Regression as LSR
-from ..tools import superscript
-from re import sub
-from io import StringIO
+
+
+colors = Colors()
 
 
 def format_file(file:str, text_columns=None) -> StringIO:
