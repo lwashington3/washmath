@@ -83,16 +83,21 @@ def graph(df:pd.DataFrame, x_column:str, y_column:str, **kwargs) -> LSR:
     :return: The line on the graph
     :rtype: LSR
     """
-    allow_fractions = kwargs.get("allows_fractions", False)  # kwargs["allow_fractions"] if "allow_fractions" in kwargs.keys() else False
-    #  x = StatList(df[x_column], title=f"{x_column} ({superscript(kwargs['x_unit'])})" if "x_unit" in kwargs.keys() else x_column, allow_fractions=allow_fractions)
+    allow_fractions = kwargs.get("allows_fractions", False)
     x = StatList(df[x_column], title=f"{superscript(x_column)} ({superscript(kwargs.get('x_unit', x_column))})", allow_fractions=allow_fractions)
     y = StatList(df[y_column], title=f"{superscript(y_column)} ({superscript(kwargs.get('y_unit', y_column))})", allow_fractions=allow_fractions)
 
-    scatter_color = convert_color(kwargs.get("scatter_color", "#4285f4"))  # kwargs["scatter_color"]) if "scatter_color" in kwargs.keys() else "#4285f4"
-    text_color = convert_color(kwargs.get("text_color", "#000000"))  # convert_color(kwargs["text_color"]) if "text_color" in kwargs.keys() else "#000000"
-    line_color = convert_color(kwargs.get("line_color", "#ea4335"))  # kwargs["line_color"]) if "line_color" in kwargs.keys() else "#ea4335"
+    background_color = convert_color(kwargs.get("background_color", colors.WHITE))
+    face_color = convert_color(kwargs.get("face_color", background_color))
+    text_color = kwargs.get("text_color", None)
+    if text_color is None:
+        text_color = colors.WHITE if Color(rgba=background_color).is_dark else colors.BLACK
+    text_color = convert_color(text_color)
 
-    scatter_marker = kwargs.get("scatter_marker", "o")  # kwargs["scatter_marker"] if "scatter_marker" in kwargs.keys() else "o"
+    scatter_color = convert_color(kwargs.get("scatter_color", "#4285f4"))
+    line_color = convert_color(kwargs.get("line_color", "#ea4335"))
+
+    scatter_marker = kwargs.get("scatter_marker", "o")
     error_format = kwargs.get("error_format", "o")
     capsize = kwargs.get("capsize", 8)
     barsabove = kwargs.get("barsabove", False)
@@ -103,7 +108,7 @@ def graph(df:pd.DataFrame, x_column:str, y_column:str, **kwargs) -> LSR:
     yerr = getattr(y, kwargs["y_deviation"]) if "y_deviation" in kwargs.keys() else None
 
     plt.style.use(kwargs.get("style", "_mpl-gallery"))
-    fig = plt.figure(figsize=kwargs.get("figsize", (12,8)))  # kwargs["figsize"] if "figsize" in kwargs else (12,8)
+    fig = plt.figure(figsize=kwargs.get("figsize", (12,8)), facecolor=background_color)
 
     ax = fig.add_subplot()
     ax.xaxis.label.set_color(text_color)
@@ -141,6 +146,7 @@ def graph(df:pd.DataFrame, x_column:str, y_column:str, **kwargs) -> LSR:
         ax.set_xticks(kwargs["xticks"])
     if "yticks" in kwargs.keys():
         ax.set_yticks(kwargs["yticks"])
+    ax.set_facecolor(face_color)
 
     # TODO: Add minor gridlines/ticks
     # ax.minorticks_on()
