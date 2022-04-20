@@ -11,7 +11,7 @@ git_url = "https://github.com/lwashington3/washmath"
 
 setup(
 	name=project_name,
-	version="2.0.0",
+	version="2.0.1",
 	author="Len Washington III",
 	author_email="l.washingtoniii.27@gmail.com",
 	description="Custom mathematics module",
@@ -19,7 +19,7 @@ setup(
 	long_description=long_description,
 	long_description_content_type="test/markdown",
 	url=git_url,
-	project_urls = {
+	project_urls={
 		"Bug Tracker": f"{git_url}/issues"
 	},
 	license="MIT",
