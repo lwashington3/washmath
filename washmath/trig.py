@@ -211,3 +211,26 @@ class ATAN(Trig):
 
     def derivative(self):
         return COS(self.x, self.degrees)
+
+
+class E:
+    def __init__(self, x:float):
+        self._x = x
+
+    def __repr__(self):
+        return f"e^{self._x} = {float(self)}"
+
+    def __float__(self):
+        return float(self())
+
+    def __call__(self, x=None):
+        if x is None and hasattr(self, "_summation"):
+            return self._summation
+        x = self._x if x is None else x
+
+        self._summation = 0
+
+        for n in range(50):
+            self._summation += x ** n / factorial(n)
+
+        return self._summation

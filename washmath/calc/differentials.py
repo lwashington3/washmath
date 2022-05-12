@@ -1,4 +1,5 @@
 from ..tools import Fraction
+from ..trig import E
 
 
 def euler(h:float, n:int, x0, y0, func, answer_only=True) -> Fraction | tuple[tuple[Fraction], tuple[Fraction]]:
@@ -18,3 +19,15 @@ def euler(h:float, n:int, x0, y0, func, answer_only=True) -> Fraction | tuple[tu
 	if answer_only:
 		return ys[-1]
 	return xs, ys
+
+
+def P(t, p0, k, M) -> Fraction:
+	"""
+	:param int|float t: The amount of time that has passed
+	:param int|float p0: The initial population
+	:param int|float k:
+	:param int|float M: The carrying capacity
+	"""
+	A = (M - p0) / p0
+	denominator = 1 + (A * float(E(k*t)))
+	return Fraction(M, denominator)
