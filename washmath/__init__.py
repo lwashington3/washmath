@@ -1,5 +1,4 @@
 __author__ = "Len Washington III"
-__version__ = "2.0.2"
 
 from .stats import *
 from .calc import *

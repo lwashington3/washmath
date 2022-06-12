@@ -1,5 +1,4 @@
 from setuptools import setup
-from washmath import __version__
 
 with open("README.md", 'r') as f:
 	long_description = f.read()
@@ -11,7 +10,7 @@ git_url = "https://github.com/lwashington3/washmath"
 
 setup(
 	name=project_name,
-	version=s__version__,
+	version="2.0.3",
 	author="Len Washington III",
 	author_email="l.washingtoniii.27@gmail.com",
 	description="Custom mathematics module",
