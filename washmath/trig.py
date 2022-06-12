@@ -228,9 +228,9 @@ class E:
             return self._summation
         x = self._x if x is None else x
 
-        self._summation = 0
+        self._summation = 1
 
-        for n in range(50):
+        for n in range(1, 50):
             self._summation += x ** n / factorial(n)
 
         return self._summation

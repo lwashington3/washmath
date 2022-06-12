@@ -20,7 +20,7 @@ def superscript(string:str) -> str:
     :param str string: The raw string containing "^"
     :return: The formatted string
     """  # FIXME: If there are multiple carats in the expression
-    return sub(r"(.*)?(\(?)(.+)\^([0-9.]+)(\)?)", r"\1\2$\3^{\4}$\5", string)
+    return sub(r"(.*)?(\(?)(.+)\^([\d.]+)(\)?)", r"\1\2$\3^{\4}$\5", string)
 
 
 def subscript(string:str) -> str:
@@ -29,4 +29,4 @@ def subscript(string:str) -> str:
     :param str string: The raw string containing "_"
     :return: The formatted string
     """
-    return sub(r"(.*)?(\(?)(.+)_([0-9.]+)(\)?)", r"\1\2$\3_{\4}$\5", string)
+    return sub(r"(.*)?(\(?)(.+)_([\d.]+)(\)?)", r"\1\2$\3_{\4}$\5", string)

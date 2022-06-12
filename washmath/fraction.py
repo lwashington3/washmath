@@ -226,6 +226,7 @@ class Fraction(object):
         self.reduce()
 
     def reduce(self):
+        from time import sleep
         if not self._allowed_to_reduce:
             return
         if self.equals(self.numerator):
@@ -233,19 +234,37 @@ class Fraction(object):
         if self.equals(self.denominator):
             self._denominator = int(self._denominator)
 
-        mult = 1
+        while self.numerator % 1 != 0:  # Can't use not because bool(0.0) == False
+            self._numerator *= 10
+            self._denominator *= 10
+
+        while self.denominator % 1 != 0:
+            self._numerator *= 10
+            self._denominator *= 10
+
+        if self.equals(self.numerator):
+            self._numerator = int(self.numerator)
+
+        if self.equals(self.denominator):
+            self._denominator = int(self.denominator)
+
+        """mult = 1
         while not (self.equals(self.numerator*mult) and self.equals(self.denominator*mult)):
             mult += 1
 
         self._numerator = int(self.numerator * mult)
-        self._denominator = int(self.denominator * mult)
+        self._denominator = int(self.denominator * mult)"""
 
         factor = gcd(self.numerator, self.denominator)
         if factor != 1 and factor != 0:
-            self.numerator /= factor
-            self.denominator /= factor
+            self._numerator /= factor
+            self._denominator /= factor
 
         return self
+
+    def is_whole(self) -> bool:
+        """Returns whether the fraction is a whole number or not"""
+        return self.denominator == 1
 
 
 if __name__ == "__main__":

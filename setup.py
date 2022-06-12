@@ -24,5 +24,5 @@ setup(
 	},
 	license="MIT",
 	packages=[project_name],
-	install_requires=["matplotlib", "numpy", "pandas", "colors @ git+https://github.com/lwashington3/colors.git"]
+	install_requires=["matplotlib", "numpy", "pandas", "tabulate", "colors @ git+https://github.com/lwashington3/colors.git"]
 )
