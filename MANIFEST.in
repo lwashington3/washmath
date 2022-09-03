@@ -4,3 +4,4 @@ recursive-include washmath/c_libs *.dll
 recursive-include washmath/calc *.py
 recursive-include washmath/physics *.py
 recursive-include washmath/stats *.py
+recursive-include washmath/classes *.py
