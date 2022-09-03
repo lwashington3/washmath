@@ -24,7 +24,7 @@ class StatList(list):
         """
         :param list lst: The collection of elements that you want to analyze
         :param str title: A title or name you want to give the data set
-        :param boolean allow_fraction: Whether or not the list will be allowed to hold Fraction objects
+        :param boolean allow_fraction: Whether the list will be allowed to hold Fraction objects
         """
         super().__init__(lst)
         self._containing_fractions = self._check_if_containing_fractions()
@@ -34,7 +34,7 @@ class StatList(list):
 
     def __str__(self) -> str:
         """
-        The string of the class contains all of the data in the class, as well as the title if it is set
+        The string of the class contains all the data in the class, as well as the title if it is set
         :return: The string of the class
         """
         if self.title == "":
@@ -253,7 +253,6 @@ class StatList(list):
         """
         self._title = str(title)
 
-
     def getList(self) -> list:
         """
         :rtype: :list: The data in a list
@@ -318,10 +317,10 @@ class StatList(list):
         self._containing_fractions = self._check_if_containing_fractions()
         self.calculate_attributes()
 
-    def sort(self, *, key: None = ..., reverse: bool = ...) -> None:
-        if self.allow_fractions:
+    def sort(self, *, key=lambda value: float(value), reverse: bool = ...) -> None:
+        """if self.allow_fractions:
             if key is None:
-                key = lambda value: float(value)
+                key = lambda value: float(value)"""
         super().sort(key, reverse)
         self._containing_fractions = self._check_if_containing_fractions()
         self.calculate_attributes()
@@ -359,7 +358,7 @@ class StatList(list):
         else:
             self._mean = self.sum / len(self)
 
-    def _setMode(self) -> int:
+    def _setMode(self):
         mode = None
         times = 0
         for unique_value in set(self):
@@ -370,12 +369,12 @@ class StatList(list):
 
         self._mode = removeDecimal(mode)
         
-    def _setMin(self) -> int:
+    def _setMin(self):
         copy = self.copy()
         copy.sort()
         self._min = removeDecimal(copy[0])
 
-    def _setMax(self) -> int:
+    def _setMax(self):
         lst = self.copy()
         lst.sort()
         self._max = removeDecimal(lst[-1])
@@ -468,7 +467,7 @@ class StatList(list):
     def mean(self):
         """
         :rtype: :float:
-        :return: The average/mean of all of the data in the collection
+        :return: The average/mean of all the data in the collection
         """
         return self._mean
 
@@ -476,7 +475,7 @@ class StatList(list):
     def average(self):
         """
         :rtype: :float:
-        :return: The average/mean of all of the data in the collection
+        :return: The average/mean of all the data in the collection
         """
         return self.mean
 
@@ -544,7 +543,7 @@ class StatList(list):
     @property
     def IQR(self):
         """
-        :return: The inter quartile range of the collection
+        :return: The interquartile range of the collection
         """
         return self._IQR
 
@@ -568,7 +567,7 @@ class StatList(list):
     @property
     def average_deviation(self):
         """
-        Returns the average deviation, also know as mean absolute deviation.
+        Returns the average deviation, also known as mean absolute deviation.
         :return: The average deviation
         """
         return self._averageDeviation
@@ -749,6 +748,8 @@ class StatList(list):
         :return: A tuple of StatList
         """
         data = open(path).readlines()
+        if not len(data):
+            return
         for line in data:
             length = len(line.split(delimiter))
         hold = [[] for _ in range(length)]

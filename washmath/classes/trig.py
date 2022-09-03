@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from .c_tools import factorial
-from .tools import is_numeric
+from ..c_tools import factorial
+from ..tools import is_basic_numeric
 from .fraction import Fraction
 
 
@@ -21,7 +21,7 @@ class Trig(ABC):
 
     @x.setter
     def x(self, x):
-        if not is_numeric(x):
+        if not is_basic_numeric(x):
             x = float(x)
         if self.degrees:
             x = self.degrees_to_radians(x)

@@ -1,5 +1,5 @@
-from ..tools import Fraction
-from ..trig import E
+from .. import Fraction
+from ..classes.trig import E
 
 
 def check_conditions(lst, ys, steps, until) -> bool:

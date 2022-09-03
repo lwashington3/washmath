@@ -1,7 +1,6 @@
 from abc import abstractmethod
 from numpy import sqrt, cbrt
-from ..fraction import Fraction
-from ..trig import Trig, SIN, COS, TAN, CSC, SEC
+from ..classes import Fraction, Trig, SIN, COS, TAN, CSC, SEC
 
 
 class Polynomial(object):
