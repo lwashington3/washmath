@@ -91,6 +91,7 @@ def graph(df:pd.DataFrame, x_column:str, y_column:str, **kwargs) -> LSR:
 	:param float x_spacing: The spacing between the ticks on the x-axis. Can be None if xticks is defined.
 	:param float y_spacing: The spacing between the ticks on the y-axis. Can be None if yticks is defined.
 	:param str style:
+	:param bool gridlines: Controls if the grid lines are shown or not.
 	:return: The line on the graph
 	:rtype: LSR
 	"""
@@ -105,8 +106,8 @@ def graph(df:pd.DataFrame, x_column:str, y_column:str, **kwargs) -> LSR:
 		text_color = colors.WHITE if Color(rgba=background_color).is_dark else colors.BLACK
 	text_color = convert_color(text_color)
 
-	scatter_color = convert_color(kwargs.get("scatter_color", "#4285f4"))
-	line_color = convert_color(kwargs.get("line_color", "#ea4335"))
+	scatter_color = convert_color(kwargs.get("scatter_color", colors.GOOGLE_SHEETS[0]))
+	line_color = convert_color(kwargs.get("line_color", colors.GOOGLE_SHEETS[1]))
 
 	scatter_marker = kwargs.get("scatter_marker", "o")
 	error_format = kwargs.get("error_format", "o")
@@ -123,8 +124,8 @@ def graph(df:pd.DataFrame, x_column:str, y_column:str, **kwargs) -> LSR:
 	point_alpha = kwargs.get("point_alpha", 1)
 	line_alpha = kwargs.get("line_alpha", 1)
 
-	xtick_rotation = kwargs.get("xtick_rotation", 180)
-	ytick_rotation = kwargs.get("ytick_rotation", 180)
+	xtick_rotation = kwargs.get("xtick_rotation", 0)
+	ytick_rotation = kwargs.get("ytick_rotation", 0)
 
 	plt.style.use(kwargs.get("style", "_mpl-gallery"))
 	fig = plt.figure(figsize=kwargs.get("figsize", (12,8)), facecolor=background_color)
@@ -217,8 +218,8 @@ def graph(df:pd.DataFrame, x_column:str, y_column:str, **kwargs) -> LSR:
 	if "subtitle" in kwargs.keys():
 		ax.set_title(kwargs["subtitle"], color=text_color)
 
-	ax.set_xticks(rotation=xtick_rotation)
-	ax.set_yticks(rotation=ytick_rotation)
+	ax.tick_params(axis="x", rotation=xtick_rotation)
+	ax.tick_params(axis="y", rotation=ytick_rotation)
 
 	ax.legend(fancybox=kwargs.get("fancybox", True),
 			  framealpha=kwargs.get("framealpha", 0),
@@ -234,6 +235,8 @@ def graph(df:pd.DataFrame, x_column:str, y_column:str, **kwargs) -> LSR:
 					 kwargs.get("waterx", 10), kwargs.get("watery", 10), zorder=kwargs.get("zorder", 3),
 					 alpha=kwargs.get("watermark_alpha", .5), resize=kwargs.get("watermark_resize", False))
 
+	if not kwargs.get("gridlines", True):
+		plt.grid(b=False)
 	plt.tight_layout()
 	if "save" in kwargs.keys():
 		plt.savefig(kwargs["save"], transparent=kwargs.get("transparent", True))
