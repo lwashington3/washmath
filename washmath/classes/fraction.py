@@ -75,6 +75,12 @@ class Number:
 			return f"{self.value}"
 		upper_power = self._upper_pow if self._upper_pow != 1 else 1
 		lower_power = self._lower_pow if self._lower_pow != 1 else 1
+
+	def __abs__(self):
+		number = Number(abs(self.value))
+		number._upper_pow = self._upper_pow
+		number._lower_pow = self._lower_pow
+		return number
 	# endregion
 
 
@@ -204,6 +210,9 @@ class Fraction(object):
 			return str(self.numerator)
 		return f"{self.numerator}/{self.denominator}"
 
+	def __bool__(self):
+		return bool(self.numerator)
+
 	def __lt__(self, other):
 		if isinstance(other, Fraction):
 			if self.denominator == other.denominator:
@@ -278,7 +287,7 @@ class Fraction(object):
 		return int(num) == num
 
 	@property
-	def numerator(self) -> Number:
+	def numerator(self):
 		return self._numerator
 
 	@numerator.setter
@@ -305,7 +314,7 @@ class Fraction(object):
 
 	@denominator.setter
 	def denominator(self, denominator):
-		#if not is_basic_numeric(denominator):
+		# if not is_basic_numeric(denominator):
 		if not is_basic_numeric(denominator) and not isinstance(denominator, (Number, Fraction)):
 			raise AttributeError(f"The denominator must be a washmath.Number, not {type(denominator).__name__}")
 		if denominator == 0:
@@ -339,7 +348,7 @@ class Fraction(object):
 		if self.equals(self.denominator):
 			self._denominator = int(self._denominator)
 
-		while self.numerator % 1 != 0:  # Can't use not because bool(0.0) == False
+		while self.numerator % 1 != 0:
 			self._numerator *= 10
 			self._denominator *= 10
 
@@ -369,5 +378,4 @@ if __name__ == "__main__":
 	frac = Fraction(1, 2)
 	frac2 = Fraction(3.08, 4)
 	print(frac2)
-	frac.reduce()
 	print(f"{frac} - {frac2} = {frac2 ** 2}")

@@ -4,13 +4,25 @@ from ..tools import is_basic_numeric
 from .fraction import Fraction
 
 
-PI = 3.14159265358979323
+class PI:
+    def __float__(self):
+        return self()
+
+    def __call__(self) -> float:
+        return 3.14159265358979323
+
+    def __truediv__(self, other):
+        return Fraction(self, denominator)
 
 
 class Trig(ABC):
     def __init__(self, x:float, degrees=False):
         self.degrees = degrees
         self.x = x
+
+    @abstractmethod
+    def __call__(self):
+        pass
 
     def __float__(self):
         return self()  # Calls __call__
@@ -42,11 +54,11 @@ class Trig(ABC):
         pass
 
     def radians_to_degrees(self):
-        return self._x * 180 / PI
+        return self._x * 180 / float(PI())
 
     @staticmethod
     def degrees_to_radians(self, degrees):
-        return degrees * PI / 180
+        return degrees * float(PI()) / 180
 
 
 class SIN(Trig):

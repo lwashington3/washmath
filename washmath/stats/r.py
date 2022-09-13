@@ -12,7 +12,7 @@ class R(object):
         :param StatList y_lst: A StatList containing the dataset that is considered to be the dependent variable
         """
         if len(x_lst) != len(y_lst):
-            raise ValueError(f"Length of lstt 1 does not equal the length of lstt 2 {len(x_lst)}!={len(y_lst)}")
+            raise ValueError(f"Length of x_lst 2 does not equal the length of y_lst {len(x_lst)}!={len(y_lst)}")
         if not isinstance(x_lst, StatList):
             self.x_lst = StatList(x_lst)
         else:

@@ -12,7 +12,7 @@ def is_numeric_but_not_fraction(number):
 
 class Vector(object):
 	def __init__(self, x, y, z=0):
-		self.x = x  # TODO: Remove this automatic conversion
+		self.x = x
 		self.y = y
 		self.z = z
 
@@ -114,6 +114,9 @@ class Vector(object):
 	def __ne__(self, other):
 		return not (self == other)
 
+	def __abs__(self):
+		return Vector(abs(self.x), abs(self.y), abs(self.z))
+
 	def __neg__(self):
 		return Vector(-self.x, -self.y, -self.z)
 
@@ -126,12 +129,16 @@ class Vector(object):
 			raise ValueError(f"The dot product takes two vectors, not a vector and a {type(other).__name__}.")
 		return (self.x * other.x) + (self.y * other.y) + (self.z * other.z)
 
-	def angle_between(self, other):
+	def angle_between(self, other, in_radians=True):
 		if not isinstance(other, Vector):
 			raise ValueError(f"Finding the angle between two vectors requires two vectors, not a vector and a {type(other).__name__}.")
 		from numpy import arccos
 		cos_theta = self.dot_product(other) / (self.magnitude * other.magnitude)
-		return arccos(cos_theta)
+		angle = arccos(cos_theta)
+		if in_radians:
+			return angle
+		from math import pi
+		return angle * (180 / pi)
 
 	def comp(self, other) -> Fraction:
 		"""
@@ -161,7 +168,62 @@ class Vector(object):
 		:param Vector other:
 		:rtype: Vector
 		"""
+
 		x = (self.y * other.z) - (self.z * other.y)
 		y = (self.z * other.x) - (self.x * other.z)
 		z = (self.x * other.y) - (self.y * other.x)
 		return Vector(x, y, z)
+
+	def volume_of_para(self, b, c) -> Fraction:
+		"""
+		:param Vector b:
+		:param Vector c:
+
+		"""
+		# v = |a * (bxc)|
+		if not isinstance(b, Vector):
+			raise ValueError(f"The first given argument finding the volume must be a Vector, not a {type(b).__name__}")
+		if not isinstance(c, Vector):
+			raise ValueError(f"The second given argument finding the volume must be a Vector, not a {type(c).__name__}")
+
+		bc = b.cross_product(c)
+		return abs(self.dot_product(bc))
+
+	def is_r1(self) -> bool:
+		"""
+		Checks if the vector is R1
+		"""
+		in_plane_list = [bool(i) for i in (self.x, self.y, self.z)]
+		return in_plane_list.count(True) == 1
+
+	def is_r2(self) -> bool:
+		"""
+		Checks if the vector is R2
+		"""
+		in_plane_list = [bool(i) for i in (self.x, self.y, self.z)]
+		return in_plane_list.count(True) == 2
+
+	def is_r3(self) -> bool:
+		"""Checks if the vector is R3"""
+		return bool(self.x) and bool(self.y) and bool(self.z)
+
+	# region Class methods
+	@classmethod
+	def from_angle(cls, magnitude, angle, in_radians=True):
+		"""
+		Creates a 2-D vector given a magnitude and angle
+		:param float magnitude: The magnitude of the vector
+		:param float angle: The angle of the vector with the positive x-axis
+		:param bool in_radians: If the given angle is in radians or not. If not, the angle will be inferred as degrees.
+		"""
+		from .trig import SIN, COS
+
+		if not in_radians:
+			from .trig import PI
+			angle = (PI() / 180) * angle
+
+		x = magnitude * COS(angle)()
+		y = magnitude * SIN(angle)()
+		return cls(x, y)
+
+	# endregion

@@ -6,6 +6,7 @@ __version__ = "3.0.0"
 
 
 from ..tools import *
+from ..classes import Fraction
 try:
     from matplotlib import pyplot as plt
     import numpy as np
