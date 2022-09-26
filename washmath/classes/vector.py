@@ -207,6 +207,35 @@ class Vector(object):
 		"""Checks if the vector is R3"""
 		return bool(self.x) and bool(self.y) and bool(self.z)
 
+	def scalar_equation_of_plane(self, normal) -> str:
+		"""
+
+		:param Vector normal: The vector orthogonal to the plane
+		"""
+		if not isinstance(normal, Vector):
+			raise ValueError(f"The normal vector must be a Vector, not a {type(b).__name__}")
+		a = normal.x
+		b = normal.y
+		c = normal.z
+
+		summation = -((a*self.x) + (b*self.y) + (c*self.z))  # TODO: Simplify if possible
+
+		return f"{a}x + {b}y + {c}z = {summation}"
+
+	def equation_of_plane(self, q, r) -> str:
+		"""
+		:param Vector q: The q point on the plane
+		:param Vector r: The r point on the plane
+		"""
+		if not isinstance(q, Vector):
+			raise ValueError(f"The first given argument finding the volume must be a Vector, not a {type(q).__name__}")
+		if not isinstance(r, Vector):
+			raise ValueError(f"The second given argument finding the volume must be a Vector, not a {type(r).__name__}")
+		a = q - self
+		b = r - self
+		normal_vector = a.cross_product(b)
+		return self.scalar_equation_of_plane(normal_vector)
+
 	# region Class methods
 	@classmethod
 	def from_angle(cls, magnitude, angle, in_radians=True):

@@ -201,7 +201,8 @@ class Fraction(object):
 		return Fraction(-abs(self.numerator), self.denominator)
 
 	def __str__(self):
-		return f"{self.numerator:,}/{self.denominator:,}"
+		return repr(self)
+		# return f"{self.numerator:,}/{self.denominator:,}"
 
 	def __repr__(self):
 		if self.numerator == 0:
