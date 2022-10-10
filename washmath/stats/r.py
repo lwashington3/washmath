@@ -21,7 +21,7 @@ class R(object):
             self.y_lst = StatList(y_lst)
         else:
             self.y_lst = y_lst
-        self.standardDeviationSums = StatList.standardDeviationSums(self.x_lst, self.y_lst)
+        self.standardDeviationSums = x_lst.standardDeviationSums(self.y_lst)
         self.r = self.standardDeviationSums / ((len(x_lst) - 1) * self.x_lst.standard_deviation * self.y_lst.standard_deviation)
 
     @staticmethod

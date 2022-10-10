@@ -130,7 +130,7 @@ class Fraction(object):
 				return Fraction(newSelf - newOther, newDenominator)
 		elif isinstance(other, (int, float)):
 			newNumerator = other * self.denominator
-			return Fraction(newNumerator - self.numerator, self.denominator)
+			return Fraction(self.numerator - newNumerator, self.denominator)
 
 	def __isub__(self, other):
 		if isinstance(other, Fraction):
@@ -176,14 +176,37 @@ class Fraction(object):
 				self.denominator *= other
 
 	def __pow__(self, power, modulo=None):
-		newNumerator = self.numerator ** power
-		newDenominator = self.denominator ** power
-		return Fraction(newNumerator, newDenominator)
+		if power == 0:
+			if self.numerator == 0:
+				raise Exception("Cannot raise 0 to the zeroth power.")
+			return Fraction(1)
+		elif power == 1:
+			return self.copy()
+		elif power > 0:
+			newNumerator = self.numerator ** power
+			newDenominator = self.denominator ** power
+			return Fraction(newNumerator, newDenominator)
+		else:
+			return Fraction(self.denominator, self.numerator) ** -power
 
 	def __ipow__(self, other, modulo=None):
-		self._numerator **= other
-		self._denominator **= other
-		return self
+		if power == 0:
+			if self.numerator == 0:
+				raise Exception("Cannot raise 0 to the zeroth power.")
+			self.numerator = self.denominator = 1
+			return self
+		elif power == 1:
+			return self
+		elif power > 0:
+			self.numerator **= power
+			self.denominator **= power
+			return self
+		else:
+			numerator = self.denominator ** power
+			denominator = self.numerator ** power
+			self.numerator = numerator
+			self.denominator = denominator
+			return self
 
 	def __float__(self):
 		return self.numerator / self.denominator
@@ -340,8 +363,10 @@ class Fraction(object):
 			self._denominator = whole_denominator
 		self.reduce()
 
+	def copy(self):
+		return Fraction(self.numerator, self.denominator)
+
 	def reduce(self):
-		from time import sleep
 		if not self._allowed_to_reduce:
 			return
 		if self.equals(self.numerator):

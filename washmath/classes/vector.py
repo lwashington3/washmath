@@ -160,7 +160,8 @@ class Vector(object):
 		if not isinstance(other, Vector):
 			raise ValueError(f"The given argument for finding the projection of a vector on another vector requires two vectors, not a vector and a {type(other).__name__}.")
 
-		return self.unit_vector * self.comp(other)
+		# return self.unit_vector * self.comp(other)
+		return self * Fraction(self.dot_product(other), self.magnitude_squared)
 
 	def cross_product(self, other):
 		"""
