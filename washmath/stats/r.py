@@ -22,7 +22,7 @@ class R(object):
         else:
             self.y_lst = y_lst
         self.standardDeviationSums = x_lst.standardDeviationSums(self.y_lst)
-        self.r = self.standardDeviationSums / ((len(x_lst) - 1) * self.x_lst.standard_deviation * self.y_lst.standard_deviation)
+        self.r = self.standardDeviationSums / (self.x_lst.standard_deviation * (len(x_lst) - 1) * self.y_lst.standard_deviation)
 
     @staticmethod
     def strength(r: float) -> str:

@@ -1,4 +1,6 @@
 from numpy import lcm, int32, int64, gcd
+from numpy.core._exceptions import UFuncTypeError
+from warnings import warn
 from ..tools import is_basic_numeric
 
 
@@ -397,10 +399,13 @@ class Fraction(object):
 		if self.equals(self.denominator):
 			self._denominator = int(self.denominator)
 
-		factor = gcd(self.numerator, self.denominator)
-		if factor != 1 and factor != 0:
-			self._numerator /= factor
-			self._denominator /= factor
+		try:
+			factor = gcd(int(self.numerator), int(self.denominator))
+			if factor != 1 and factor != 0:
+				self._numerator /= factor
+				self._denominator /= factor
+		except UFuncTypeError as e:
+			warn(str(e))
 
 		return self
 

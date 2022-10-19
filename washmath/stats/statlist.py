@@ -393,7 +393,7 @@ class StatList(list):
 		squares = [(Fraction(point) - self.mean) ** 2 for point in self]
 		self._standardDeviation = sum(squares, start=Fraction(0, 1))
 		self._standardDeviation /= (len(self) - 1)  # I have len(self) - 1 but some sources say just len(self), including Google Sheets, look into which is right
-		self._standardDeviation **= Fraction(1, 2)
+		self._standardDeviation **= 0.5
 
 	def _setQ1(self):
 		lst = self.getList()
@@ -427,11 +427,11 @@ class StatList(list):
 		self._outliers = tuple(point for point in self if self.isOutlier(point))
 
 	def _setAverageDeviation(self):
-		lst = [abs(point - self.mean) for point in self]
+		lst = [abs(-self.mean + point) for point in self]
 		self._averageDeviation = Fraction(sum(lst, start=Fraction(0, 1)), len(self))
 
 	def _setVariance(self):
-		lst = [(point - self.mean) ** 2 for point in self]
+		lst = [(-self.mean + point) ** 2 for point in self]
 		self._variance = sum(lst, start=Fraction(0,1)) / (len(self) - 1)
 
 	def _setStandardError(self):
@@ -631,8 +631,8 @@ class StatList(list):
 			raise TypeError(f"other is not of type 'StatList'\nAdd StatList() around the parameter you pass")
 		summation = Fraction(0)
 		for x, y in zip(self, other):
-			x_diff = Fraction(x - self.mean)
-			y_diff = Fraction(y - other.mean)
+			x_diff = Fraction(x) - self.mean
+			y_diff = Fraction(y) - other.mean
 			summation += (x_diff * y_diff)
 		return summation
 

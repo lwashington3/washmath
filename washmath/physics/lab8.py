@@ -1,3 +1,6 @@
+from ..classes import Vector, Fraction
+
+
 def electric_force(velocity:Vector, magnetic_field:Vector, electric_field:Vector, charge:Fraction = Fraction(1)) -> Vector:
 	"""
 	Returns the total electric force
