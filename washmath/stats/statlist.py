@@ -391,6 +391,7 @@ class StatList(list):
 			self._standardDeviation = 0
 			return
 		squares = [(Fraction(point) - self.mean) ** 2 for point in self]
+		print([float(i) for i in squares])
 		self._standardDeviation = sum(squares, start=Fraction(0, 1))
 		self._standardDeviation /= (len(self) - 1)  # I have len(self) - 1 but some sources say just len(self), including Google Sheets, look into which is right
 		self._standardDeviation **= 0.5

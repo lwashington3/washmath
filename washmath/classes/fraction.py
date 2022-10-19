@@ -91,9 +91,15 @@ class Fraction(object):
 
 	def __init__(self, numerator, denominator=1):
 		self._allowed_to_reduce = False
-		self.numerator = numerator
+		if isinstance(denominator, Fraction):
+			self.numerator = numerator * denominator.denominator
+		else:
+			self.numerator = numerator
 		self._allowed_to_reduce = True
-		self.denominator = denominator
+		if hasattr(self, "_denominator"):
+			self.denominator *= denominator  # The numerator was a fraction, and the new denominator needs to be multiplied by the old one.
+		else:
+			self.denominator = denominator
 
 	# region Operator Overloads
 	def __add__(self, other):
@@ -192,6 +198,8 @@ class Fraction(object):
 			return Fraction(self.denominator, self.numerator) ** -power
 
 	def __ipow__(self, power, modulo=None):
+		if self < 0 and power < 1:
+			raise ValueError("Can't take the root of a negative fraction.")
 		if power == 0:
 			if self.numerator == 0:
 				raise Exception("Cannot raise 0 to the zeroth power.")
@@ -200,7 +208,9 @@ class Fraction(object):
 		elif power == 1:
 			return self
 		elif power > 0:
+			self._allowed_to_reduce = False
 			self.numerator **= power
+			self._allowed_to_reduce = True
 			self.denominator **= power
 			return self
 		else:
