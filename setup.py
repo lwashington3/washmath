@@ -10,7 +10,7 @@ git_url = "https://github.com/lwashington3/washmath"
 
 setup(
 	name=project_name,
-	version="2.0.7",
+	version="2.0.8",
 	author="Len Washington III",
 	author_email="l.washingtoniii.27@gmail.com",
 	description="Custom mathematics module",

@@ -344,19 +344,10 @@ class StatList(list):
 		self._setStandardError()
 
 	def _setSum(self):
-		if self.containing_fractions:
-			fraction = any([isinstance(i, Fraction) for i in self])
-			# If there is a fraction then summation needs to be a fraction
-			start = Fraction(0, 1) if fraction else 0
-		else:
-			start = 0
-		self._sum = removeDecimal(sum(self, start=start))
+		self._sum = sum(self, start=Fraction(0))
 
 	def _setMean(self):
-		if self.containing_fractions:
-			self._mean = Fraction(1, len(self)) * self.sum
-		else:
-			self._mean = self.sum / len(self)
+		self._mean = Fraction(self.sum, len(self))
 
 	def _setMode(self):
 		mode = None
@@ -367,17 +358,17 @@ class StatList(list):
 				mode = unique_value
 				times = count
 
-		self._mode = removeDecimal(mode)
+		self._mode = mode
 
 	def _setMin(self):
 		copy = self.copy()
 		copy.sort()
-		self._min = removeDecimal(copy[0])
+		self._min = copy[0]
 
 	def _setMax(self):
 		lst = self.copy()
 		lst.sort()
-		self._max = removeDecimal(lst[-1])
+		self._max = lst[-1]
 
 	@staticmethod
 	def _getMedian(lst) -> float:
@@ -395,71 +386,62 @@ class StatList(list):
 		else:
 			return lst[(len(lst) // 2)]
 
-	def _setStandardDeviation(self) -> float:
+	def _setStandardDeviation(self):
 		if len(self) == 1:
 			self._standardDeviation = 0
 			return
-		if self.containing_fractions:
-			squares = [(Fraction(point) - self.mean) ** 2 for point in self]
-			self._standardDeviation = sum(squares, start=Fraction(0, 1))
-		else:
-			self._standardDeviation = sum([(point - self.mean) ** 2 for point in self])
+		squares = [(Fraction(point) - self.mean) ** 2 for point in self]
+		self._standardDeviation = sum(squares, start=Fraction(0, 1))
 		self._standardDeviation /= (len(self) - 1)  # I have len(self) - 1 but some sources say just len(self), including Google Sheets, look into which is right
-		self._standardDeviation **= 0.5
+		self._standardDeviation **= Fraction(1, 2)
 
-	def _setQ1(self) -> int:
+	def _setQ1(self):
 		lst = self.getList()
 		lst.sort()
 		if len(lst) % 2 == 1:
 			lst = lst[:int(len(lst) / 2)]
 		else:
 			lst = lst[:(len(lst) // 2)]
-		self._Q1 = removeDecimal(self._getMedian(lst))
+		self._Q1 = self._getMedian(lst)
 
-	def _setQ3(self) -> int:
+	def _setQ3(self):
 		lst = self.getList()
 		lst.sort()
 		if len(lst) % 2 == 1:
 			lst = lst[int(len(lst) / 2) + 1:]
 		else:
 			lst = lst[(len(lst) // 2):]
-		self._Q3 = removeDecimal(self._getMedian(lst))
+		self._Q3 = self._getMedian(lst)
 
 	def _setRange(self):
-		self._range = removeDecimal(self.max - self.min)
+		self._range = self.max - self.min
 
 	def _setIQR(self):
-		self._IQR = removeDecimal(self.Q3 - self.Q1)
+		self._IQR = self.Q3 - self.Q1
 
 	def _setOutlierRange(self):
-		outlier = 1.5 * self.IQR
-		self._outlier_range = (removeDecimal(outlier - self.Q1), removeDecimal(outlier + self.Q3))
+		outlier = Fraction(3, 2) * self.IQR
+		self._outlier_range = (outlier - self.Q1, outlier + self.Q3)
 
 	def _setOutliers(self):
 		self._outliers = tuple(point for point in self if self.isOutlier(point))
 
 	def _setAverageDeviation(self):
-		if self.containing_fractions:
-			lst = [abs(point - self.mean) for point in self]
-			self._averageDeviation = removeDecimal(sum(lst, start=Fraction(0, 1)) / len(self))
-		else:
-			self._averageDeviation = removeDecimal(sum([abs(point - self.mean) for point in self]) / len(self))
+		lst = [abs(point - self.mean) for point in self]
+		self._averageDeviation = Fraction(sum(lst, start=Fraction(0, 1)), len(self))
 
 	def _setVariance(self):
-		if self.containing_fractions:
-			lst = [(point - self.mean) ** 2 for point in self]
-			self._variance = sum(lst, start=Fraction(0,1)) / (len(self) - 1)
-		else:
-			self._variance = sum([(point - self.mean) ** 2 for point in self]) / (len(self) - 1)
+		lst = [(point - self.mean) ** 2 for point in self]
+		self._variance = sum(lst, start=Fraction(0,1)) / (len(self) - 1)
 
 	def _setStandardError(self):
-		self._standardError = self.standard_deviation / np.sqrt(len(self))
+		self._standardError = Fraction(self.standard_deviation, np.sqrt(len(self)))
 
 	@property
 	def sum(self) -> int:
 		"""
 		:rtype: :float:
-		:return: The sum of all of the data in the collection
+		:return: The sum of all the data in the collection
 		"""
 		return self._sum
 
@@ -637,58 +619,6 @@ class StatList(list):
 			data = tabulate(data)
 		return data
 
-	def showBoxChart(self, file="") -> None:
-		fig, ax1 = plt.subplots(nrows=1, ncols=1)
-		bplot1 = ax1.boxplot(np.array(self.getList()),
-							 notch=False,
-							 vert=True,  # vertical box alignment
-							 patch_artist=True,  # fill with color
-							 meanline=True,
-							 showmeans=True,
-							 showfliers=True)  # will be used to label x-ticks
-		ax1.set_title(self.title)
-
-		blue = ["cyan", "blue"]
-		red = ["tan", "red"]
-		purple = ["#B695C0", "purple"]
-		dark, light = blue
-		plt.setp(bplot1['boxes'][0], color=dark)
-		plt.setp(bplot1['fliers'][0], color=dark)
-		plt.setp(bplot1['caps'][0], color=dark)
-		plt.setp(bplot1['caps'][1], color=dark)
-		bplot1['boxes'][0].set_facecolor(light)
-		plt.setp(bplot1['means'][0], color=dark)
-		plt.setp(bplot1['medians'][0], color=dark)
-		plt.setp(bplot1['whiskers'][0], color=dark)
-		plt.setp(bplot1['whiskers'][1], color=dark)
-
-		if file != "":
-			plt.gcf().savefig(f"{file}.svg", format="svg")
-			plt.gcf().savefig(f"{file}.png", format="png")
-		plt.show()
-		plt.clf()
-		plt.close()
-
-	def showBarChart(self, file="", xlabel="", ylabel="", title="", color="blue") -> None:
-		"""
-		Displays a bar chart of the data
-		:param str file: The file you want to save the graph to. Does not save if blank
-		:param str xlabel: The label you want for the x values
-		:param str ylabel: The label you want for the y values
-		:param str title: The title for the chart
-		:param str color: The color of the bar chart. Accepts RGB values like #00ff00
-		"""
-		plt.xlabel(xlabel)
-		plt.ylabel(ylabel)
-		plt.title(title)
-		plt.bar(range(len(self.lst)), self.lst, color=color)
-		if file != "":
-			plt.gcf().savefig(f"{file}.svg", format="svg")
-			plt.gcf().savefig(f"{file}.png", format="png")
-		plt.show()
-		# plt.clf()
-		# plt.close()
-
 	def standardDeviationSums(self, other) -> Fraction:
 		"""
 		Returns the sum of each standard deviation in lst1 and lst2. Used for calculating the correlation coefficient.
@@ -756,7 +686,7 @@ class StatList(list):
 			tmp = [i.strip().replace("\n", "") for i in tmp]
 			for i in range(len(tmp)):
 				try:
-					hold[i].append(removeDecimal(float(tmp[i])))
+					hold[i].append(Fraction(float(tmp[i])))
 				except ValueError:
 					hold[i].append(tmp[i])
 		final = []

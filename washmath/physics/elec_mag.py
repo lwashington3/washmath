@@ -1,4 +1,4 @@
-from ..classes import Fraction
+from ..classes import Fraction, Vector
 
 
 def total_series_capacity(*capacities) -> Fraction:

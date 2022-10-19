@@ -189,7 +189,7 @@ class Fraction(object):
 		else:
 			return Fraction(self.denominator, self.numerator) ** -power
 
-	def __ipow__(self, other, modulo=None):
+	def __ipow__(self, power, modulo=None):
 		if power == 0:
 			if self.numerator == 0:
 				raise Exception("Cannot raise 0 to the zeroth power.")
@@ -302,6 +302,15 @@ class Fraction(object):
 	def __hash__(self):
 		return hash((self.numerator, self.denominator))
 
+	def __format__(self, format_spec):
+		if format_spec == ",":
+			if self.numerator == 0:
+				return "0"
+			if self.denominator == 1:
+				return f"{self.numerator:,}"
+			return f"{self.numerator:,}/{self.denominator:,}"
+		return format(float(self), format_spec)
+
 	def __round__(self, ndigits=0):
 		return round(float(self), ndigits)
 	# endregion
@@ -326,7 +335,7 @@ class Fraction(object):
 			self._numerator = numerator
 			# numerator = Number(int)
 		if isinstance(numerator, Fraction):
-			self._denominator = numerator.denominator * (self.denominator if hasattr(self, "denominator") else 1)
+			self._denominator = numerator.denominator * (self.denominator if hasattr(self, "_denominator") else 1)
 			self._numerator = numerator.numerator
 		elif isinstance(numerator, Number):
 			self._numerator = numerator
