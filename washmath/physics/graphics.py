@@ -54,7 +54,7 @@ def read_csv(file:str, remove_formatting=True, index="Trial #", text_columns=Non
 	return df
 
 
-def graph(df:pd.DataFrame, x_column:str, y_column:str, **kwargs) -> LSR:
+def graph(df:pd.DataFrame, x_column:str, y_column:str, x_unit:str="", y_unit:str="", **kwargs) -> LSR:
 	"""
 	A function made to quickly graph data from IIT's PHYS 123 and 221 labs
 	:param pd.DataFrame df: The dataframe holding the necessary data
@@ -62,6 +62,7 @@ def graph(df:pd.DataFrame, x_column:str, y_column:str, **kwargs) -> LSR:
 	:param str y_column: The column name the dependent values are stored in
 	:param str x_unit: The unit of the independent variable for labels
 	:param str y_unit: The unit of the dependent variable for labels
+	:param str slope_unit: The unit of the slope.
 	:param str or Color scatter_color: The color of the scatter plot
 	:param str or Color text_color: The color for any text and the axes. Legend label colors excluded.
 	:param str or Color line_color: The color of the line of best fit for the data.
@@ -70,7 +71,6 @@ def graph(df:pd.DataFrame, x_column:str, y_column:str, **kwargs) -> LSR:
 	:param fancybox:
 	:param capsize: The size of the caps for standard deviation caps. Default is 8.
 	:param framealpha: The transparency of the box around the legened.
-	:param bool allow_fractions: Whether there are fraction objects in your dataset. If false, graphs will be generated faster.
 	:param str scatter_marker: The marker format for the scatter plot
 	:param str line_format: The marker format for the line of best fit
 	:param str error_format: The format for the error bar. Look at the documentation of matplotlib formats for possible values.
@@ -95,9 +95,8 @@ def graph(df:pd.DataFrame, x_column:str, y_column:str, **kwargs) -> LSR:
 	:return: The line on the graph
 	:rtype: LSR
 	"""
-	allow_fractions = kwargs.get("allows_fractions", False)
-	x = StatList(df[x_column], title=f"{superscript(x_column)} ({superscript(kwargs.get('x_unit', x_column))})", allow_fractions=allow_fractions)
-	y = StatList(df[y_column], title=f"{superscript(y_column)} ({superscript(kwargs.get('y_unit', y_column))})", allow_fractions=allow_fractions)
+	x = StatList(df[x_column], title=f"{superscript(x_column)} ({superscript(x_unit)})", allow_fractions=allow_fractions)
+	y = StatList(df[y_column], title=f"{superscript(y_column)} ({superscript(y_unit)})", allow_fractions=allow_fractions)
 
 	background_color = convert_color(kwargs.get("background_color", colors.WHITE))
 	face_color = convert_color(kwargs.get("face_color", background_color))
@@ -129,6 +128,7 @@ def graph(df:pd.DataFrame, x_column:str, y_column:str, **kwargs) -> LSR:
 
 	plt.style.use(kwargs.get("style", "_mpl-gallery"))
 	fig = plt.figure(figsize=kwargs.get("figsize", (12,8)), facecolor=background_color)
+	slope_unit = " " + kwargs["slope_unit"] if "slope_unit" in kwargs else ""
 
 	ax = fig.add_subplot()
 	ax.xaxis.label.set_color(text_color)
@@ -202,7 +202,7 @@ def graph(df:pd.DataFrame, x_column:str, y_column:str, **kwargs) -> LSR:
 
 	ax.plot(possible_values, [line.predict(i) for i in possible_values],
 			kwargs.get("line_format", "-"),
-			label=f"Slope: {line.slope:.6}\nY-Intercept: {line.y_intercept:.6}\n{superscript('R^2')}: {line.r_squared:.6}",
+			label=f"Slope: {line.slope:.6} {slope_unit}\nY-Intercept: {line.y_intercept:.6} {y_unit}\n{superscript('R^2')}: {line.r_squared:.6}",
 			color=line_color, alpha=line_alpha)
 
 	ax.set_xlabel(x.title, color=text_color)
