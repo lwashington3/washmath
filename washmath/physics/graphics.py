@@ -92,11 +92,19 @@ def graph(df:pd.DataFrame, x_column:str, y_column:str, x_unit:str="", y_unit:str
 	:param float y_spacing: The spacing between the ticks on the y-axis. Can be None if yticks is defined.
 	:param str style:
 	:param bool gridlines: Controls if the grid lines are shown or not.
+	:param bool auto_superscript: Whether the function should automatically turn strings into exponents if they have a carat. Default is True.
 	:return: The line on the graph
 	:rtype: LSR
 	"""
-	x = StatList(df[x_column], title=f"{superscript(x_column)} ({superscript(x_unit)})", allow_fractions=allow_fractions)
-	y = StatList(df[y_column], title=f"{superscript(y_column)} ({superscript(y_unit)})", allow_fractions=allow_fractions)
+	auto_superscript = kwargs.get("auto_superscript", False)
+	if auto_superscript:
+		x = StatList(df[x_column], title=f"{superscript(x_column)} ({superscript(x_unit)})")
+		y = StatList(df[y_column], title=f"{superscript(y_column)} ({superscript(y_unit)})")
+		slope_unit = " " + superscript(kwargs["slope_unit"]) if "slope_unit" in kwargs else ""
+	else:
+		x = StatList(df[x_column], title=f"x_column (x_unit)")
+		y = StatList(df[y_column], title=f"y_column (y_unit)")
+		slope_unit = " " + kwargs["slope_unit"] if "slope_unit" in kwargs else ""
 
 	background_color = convert_color(kwargs.get("background_color", colors.WHITE))
 	face_color = convert_color(kwargs.get("face_color", background_color))
@@ -128,7 +136,6 @@ def graph(df:pd.DataFrame, x_column:str, y_column:str, x_unit:str="", y_unit:str
 
 	plt.style.use(kwargs.get("style", "_mpl-gallery"))
 	fig = plt.figure(figsize=kwargs.get("figsize", (12,8)), facecolor=background_color)
-	slope_unit = " " + kwargs["slope_unit"] if "slope_unit" in kwargs else ""
 
 	ax = fig.add_subplot()
 	ax.xaxis.label.set_color(text_color)
@@ -158,7 +165,10 @@ def graph(df:pd.DataFrame, x_column:str, y_column:str, x_unit:str="", y_unit:str
 		data_groups = [df[df[groupby] == key] for key, group in df.groupby(groupby)]
 		for group in data_groups:
 			key = group[groupby].iloc[0]
-			groupby_unit = f" {superscript(kwargs['groupby_unit'])}" if "groupby_unit" in kwargs.keys() else ""
+			if auto_superscript:
+				groupby_unit = f" {superscript(kwargs['groupby_unit'])}" if "groupby_unit" in kwargs.keys() else ""
+			else:
+				groupby_unit = f" {kwargs['groupby_unit']}" if "groupby_unit" in kwargs.keys() else ""
 			ax.scatter(group[x_column], group[y_column], label=f"{groupby} ({key}{groupby_unit})",
 					   color=group_colors[key], marker=scatter_marker, alpha=point_alpha)
 
@@ -202,7 +212,7 @@ def graph(df:pd.DataFrame, x_column:str, y_column:str, x_unit:str="", y_unit:str
 
 	ax.plot(possible_values, [line.predict(i) for i in possible_values],
 			kwargs.get("line_format", "-"),
-			label=f"Slope: {line.slope:.6} {slope_unit}\nY-Intercept: {line.y_intercept:.6} {y_unit}\n{superscript('R^2')}: {line.r_squared:.6}",
+			label=f"Slope: {line.slope:.6}{slope_unit}\nY-Intercept: {line.y_intercept:.6} {y_unit}\n$R^{2}$: {line.r_squared:.6}",
 			color=line_color, alpha=line_alpha)
 
 	ax.set_xlabel(x.title, color=text_color)
