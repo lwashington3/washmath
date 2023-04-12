@@ -244,7 +244,7 @@ class Fraction(object):
 			return "0"
 		if self.denominator == 1:
 			return str(self.numerator)
-		return f"{self.numerator}/{self.denominator}"
+		return f"{self.numerator}/{self.denominator} ({float(self)})"
 
 	def __bool__(self):
 		return bool(self.numerator)

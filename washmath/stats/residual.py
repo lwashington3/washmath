@@ -4,6 +4,7 @@ __author__ = "Len Washington III"
 
 from .statlist import StatList
 from .lsr import Least_Squares_Regression
+from ..classes import Fraction
 
 
 class Residual(object):
@@ -17,31 +18,37 @@ class Residual(object):
 		self.x = x
 		self.y = y
 		self.prediction = prediction
-		self.residual = (self._diff_sum() / (len(y)-2)) ** 0.5
+		self._residual = (self._diff_sum() / (len(y)-2)) ** 0.5
 
-	def getResidual(self):
+	@property
+	def residual(self):
 		"""
 		:rtype: float
 		:return: The residual of the equation
 		"""
-		return self.residual
+		return self._residual
 
-	def _diff_sum(self):
+	@property
+	def sse(self) -> Fraction:
+		return sum([(yi - self.prediction.y_intercept - (self.prediction.slope*xi))**2 for xi, yi in zip(self.x, self.y)], start=Fraction(0))
+
+	def _diff_sum(self) -> Fraction:
 		"""
 		:rtype: float
 		:return: The difference of sums between the actual dependent variables and the predicted variables
 		"""
-		sum = 0.0
-		y_lstt = self.y
-		predict_lstt = [self.prediction.slope * x + self.prediction.y_intercept for x in self.x]
-		self.residuals = []
-		for (y, predict) in zip(y_lstt, predict_lstt):
-			sum += y - predict
+		sum = Fraction(0)
+		predictions = [self.prediction.predict(x) for x in self.x]
+		self._residuals = [None] * len(self)
+		for (y, predict) in zip(self.y, predictions):
+			point = Fraction(y) - Fraction(predict)
+			sum += point
 			self.residuals.append(point)
 		return sum
 
-	def getResidualPoints(self):
-		return self.residuals
+	@property
+	def residuals(self):
+		return self._residuals
 
 	def __str__(self):
 		"""

@@ -21,15 +21,17 @@ class StatList(list):
 	A class used to help with statistical analysis of a list of data. Used in almost all classes in this package. Most functions do not rely on outside packages
 	"""
 
-	def __init__(self, lst: list, title="", allow_fractions=True):
+	def __init__(self, *values, title="", allow_fractions=True):
 		"""
 		:param list lst: The collection of elements that you want to analyze
 		:param str title: A title or name you want to give the data set
 		:param boolean allow_fraction: Whether the list will be allowed to hold Fraction objects
 		"""
-		super().__init__(lst)
-		self._containing_fractions = self._check_if_containing_fractions()
+		super().__init__([None] * len(values))
 		self.allow_fractions = allow_fractions
+		for i, value in enumerate(values):
+			self[i] = Fraction(value)
+		self._containing_fractions = self._check_if_containing_fractions()
 		self.title = title
 		self.calculate_attributes()
 

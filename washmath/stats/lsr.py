@@ -5,6 +5,7 @@ __author__ = "Len Washington III"
 # Least Squares Regression
 
 
+from ..classes import Fraction
 from .statlist import StatList
 from .r import R
 
@@ -16,11 +17,20 @@ class Least_Squares_Regression(object):
 		:param washmath.stats.StatList x: A StatList containing the dataset that is considered to be the independent variable
 		:param washmath.stats.StatList y: A StatList containing the dataset that is considered to be the dependent variable
 		"""
+		# self.x = x
+		# self.y = y
+		# self._r = R(self.x, self.y).getR()
+		# self._b1 = self.r * (self.y.standard_deviation / self.x.standard_deviation)
+		# self._b0 = self.y.mean - self._b1 * self.x.mean
+
 		self.x = x
 		self.y = y
-		self._r = R(self.x, self.y).getR()
-		self._b1 = self.r * (self.y.standard_deviation / self.x.standard_deviation)
-		self._b0 = self.y.mean - self._b1 * self.x.mean
+
+		s_xy = sum([(x1-x.mean) * (y1-y.mean) for x1, y1 in zip(x, y)], start=Fraction(0))
+		s_xx = sum([(x1-x.mean) * (x1-x.mean) for x1 in x], start=Fraction(0))
+		self._b1 = s_xy / s_xx
+		self._b0 = self.y.mean - (self._b1 * self.x.mean)
+
 
 	@property
 	def x(self) -> StatList:

@@ -102,8 +102,8 @@ def graph(df:pd.DataFrame, x_column:str, y_column:str, x_unit:str="", y_unit:str
 		y = StatList(df[y_column], title=f"{superscript(y_column)} ({superscript(y_unit)})")
 		slope_unit = " " + superscript(kwargs["slope_unit"]) if "slope_unit" in kwargs else ""
 	else:
-		x = StatList(df[x_column], title=f"x_column (x_unit)")
-		y = StatList(df[y_column], title=f"y_column (y_unit)")
+		x = StatList(df[x_column], title=f"{x_column} (x_unit)")
+		y = StatList(df[y_column], title=f"{y_column} (y_unit)")
 		slope_unit = " " + kwargs["slope_unit"] if "slope_unit" in kwargs else ""
 
 	background_color = convert_color(kwargs.get("background_color", colors.WHITE))
