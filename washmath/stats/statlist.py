@@ -628,7 +628,7 @@ class StatList(list):
 		:return: The sum of standard deviations
 		"""
 		if len(self) != len(other):
-			raise ValueError(f"Length of lst1 does not equal the length of lst2 {len(self)}!={len(other)}")
+			raise ValueError(f"Length of lst1 does not equal the length of lst2: {len(self)}!={len(other)}")
 		elif not isinstance(other, StatList):
 			raise TypeError(f"other is not of type 'StatList'\nAdd StatList() around the parameter you pass")
 		summation = Fraction(0)
@@ -697,5 +697,5 @@ class StatList(list):
 			if not isinstance(title, str):
 				i.insert(title, 0)
 				title = ""
-			final.append(StatList(i, title))
+			final.append(StatList(*i, title=title))
 		return tuple(final)

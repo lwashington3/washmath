@@ -19,7 +19,7 @@ class Least_Squares_Regression(object):
 		"""
 		# self.x = x
 		# self.y = y
-		# self._r = R(self.x, self.y).getR()
+		# self._r = R(self.x, self.y).r
 		# self._b1 = self.r * (self.y.standard_deviation / self.x.standard_deviation)
 		# self._b0 = self.y.mean - self._b1 * self.x.mean
 
@@ -30,7 +30,7 @@ class Least_Squares_Regression(object):
 		s_xx = sum([(x1-x.mean) * (x1-x.mean) for x1 in x], start=Fraction(0))
 		self._b1 = s_xy / s_xx
 		self._b0 = self.y.mean - (self._b1 * self.x.mean)
-
+		self._r = R(self.x, self.y).r
 
 	@property
 	def x(self) -> StatList:

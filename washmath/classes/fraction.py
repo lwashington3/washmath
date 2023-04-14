@@ -1,5 +1,5 @@
 from numpy import lcm, int32, int64, gcd
-from numpy.core._exceptions import UFuncTypeError
+from numpy.core._exceptions import UFuncTypeError, _UFuncNoLoopError
 from warnings import warn
 from ..tools import is_basic_numeric
 
@@ -254,9 +254,12 @@ class Fraction(object):
 			if self.denominator == other.denominator:
 				return self.numerator < other.numerator
 			else:
-				newDenominator = lcm(self.denominator, other.denominator)
-				newSelf = self.numerator * (self.denominator / newDenominator)
-				newOther = other.numerator * (other.denominator / newDenominator)
+				try:
+					newDenominator = lcm(self.denominator, other.denominator)
+				except _UFuncNoLoopError:
+					newDenominator = self.denominator * other.denominator
+				newSelf = self.numerator * (newDenominator / self.denominator)
+				newOther = other.numerator * (newDenominator / other.denominator)
 				return newSelf < newOther
 		return float(self) < other
 
@@ -265,33 +268,14 @@ class Fraction(object):
 			if self.denominator == other.denominator:
 				return self.numerator > other.numerator
 			else:
-				newDenominator = lcm(self.denominator, other.denominator)
-				newSelf = self.numerator * (self.denominator / newDenominator)
-				newOther = other.numerator * (other.denominator / newDenominator)
+				try:
+					newDenominator = lcm(self.denominator, other.denominator)
+				except _UFuncNoLoopError:
+					newDenominator = self.denominator * other.denominator
+				newSelf = self.numerator * (newDenominator / self.denominator)
+				newOther = other.numerator * (newDenominator / other.denominator)
 				return newSelf > newOther
 		return float(self) > other
-
-	def __le__(self, other):
-		if isinstance(other, Fraction):
-			if self.denominator == other.denominator:
-				return self.numerator <= other.numerator
-			else:
-				newDenominator = lcm(self.denominator, other.denominator)
-				newSelf = self.numerator * (self.denominator / newDenominator)
-				newOther = other.numerator * (other.denominator / newDenominator)
-				return newSelf <= newOther
-		return float(self) <= other
-
-	def __ge__(self, other):
-		if isinstance(other, Fraction):
-			if self.denominator == other.denominator:
-				return self.numerator >= other.numerator
-			else:
-				newDenominator = lcm(self.denominator, other.denominator)
-				newSelf = self.numerator * (self.denominator / newDenominator)
-				newOther = other.numerator * (other.denominator / newDenominator)
-				return newSelf >= newOther
-		return float(self) >= other
 
 	def __eq__(self, other):
 		if isinstance(other, int):
@@ -301,12 +285,19 @@ class Fraction(object):
 				return self.numerator == other.numerator
 			else:
 				newDenominator = lcm(self.denominator, other.denominator)
-				newSelf = self.numerator * (self.denominator / newDenominator)
-				newOther = other.numerator * (other.denominator / newDenominator)
+				newSelf = self.numerator * (newDenominator / self.denominator)
+				newOther = other.numerator * (newDenominator / other.denominator)
 				return newSelf == newOther
 		elif isinstance(other, bool):
 			return bool(self) == other
 		return float(self) == other
+
+
+	def __le__(self, other):
+		return (self < other) or (self == other)
+
+	def __ge__(self, other):
+		return (self > other) or (self == other)
 
 	def __ne__(self, other):
 		return not (self == other)
