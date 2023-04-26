@@ -1,106 +1,100 @@
+from .statlist import StatList
+from ..classes import Fraction
+
+
+__ALL__ = ["ANOVA"]
+
+
+def calculate_sst(statlists:list[StatList]) -> tuple[Fraction, Fraction]:
+	mean = Fraction(0)
+
+	for statlist in statlists:
+		mean += statlist.mean
+
+	mean /= len(statlists)
+
+	lst_total = sum([(statlist.mean - mean)**2 * len(statlist) for statlist in statlists], start=Fraction(0))
+
+	return lst_total, mean
+
+
+def calculate_sse(statlists:list[StatList]) -> Fraction:
+	return sum([statlist.variance * (len(statlist)-1) for statlist in statlists], start=Fraction(0))
+
+
 class ANOVA(object):
-    def __init__(self, groups, length, lst, pprint=True):
-        self.lst = lst
-        self.length = length  # Same as n
-        self.groups = groups  # Same as k
-        self.mean, self.items = self.mean(lst)
+	def __init__(self, *lsts, pprint=True):
+		lsts = list(lsts)
+		for i, lst in enumerate(lsts):
+			if not isinstance(lst, StatList):
+				lsts[i] = StatList(lst)
+		self.statlists = lsts
 
-        self.SST = self.SST_cal(lst, self.mean)  # Sum of squares treatment
-        self.SSE = self.SSE_cal(lst)  # Sum of squares error
-        self.SS = self.SST + self.SSE  # Sum of squares total
-        if pprint:
-            print(f"SST = {self.SST}\nSSE = {self.SSE}\nSS Total = {self.SS}")
+		self.n = sum([len(statlist) for statlist in self.statlists])  # Same as n
+		self.k = len(self.statlists)
 
-        self.DFT = self.groups - 1  # Degrees of Freedom Treatments
-        self.DFE = self.length - self.groups  # Degrees of Freedom Error
-        self.DF = self.length - 1  # Total Degrees of Freedom, equals DFT + DFE
-        if pprint:
-            print(f"DFT = {self.DFT}\nDFE = {self.DFE}\nDF Total = {self.DF}")
+		self.SST, self.mean = calculate_sst(self.statlists)  # Sum of squares treatment
+		self.SSE = calculate_sse(self.statlists)  # Sum of squares error
+		self.SS = self.SST + self.SSE  # Sum of squares total
+		if pprint:
+			print(f"SST = {self.SST}\nSSE = {self.SSE}\nSS Total = {self.SS}")
 
-        self.MST = self.SST / self.DFT  # Mean Square Treatment
-        self.MSE = self.SSE / self.DFE  # Mean Square Error, pooled variance
-        self.F = self.MST / self.MSE
-        if pprint:
-            print(f"MST = {self.MST}\nMSE = {self.MSE}\nF Total = {self.F}")  # This gives independent weighted and unweighted accoding to vassarstats
+		self.DFT = self.k - 1  # Degrees of Freedom Treatments
+		self.DFE = self.n - self.k  # Degrees of Freedom Error
+		self.DF = self.n - 1  # Total Degrees of Freedom, equals DFT + DFE
+		if pprint:
+			print(f"DFT = {self.DFT}\nDFE = {self.DFE}\nDF Total = {self.DF}")
 
-    def getAnova(self):
-        return self.F
+		self.MST = self.SST / self.DFT  # Mean Square Treatment
+		self.MSE = self.SSE / self.DFE  # Mean Square Error, pooled variance
+		self.F = self.MST / self.MSE
+		if pprint:
+			print(f"MST = {self.MST}\nMSE = {self.MSE}\nF Total = {self.F}")  # This gives independent weighted and unweighted accoding to vassarstats
 
-    @staticmethod
-    def mean(lst):
-        mean = 0.0
-        items = 0
-        for li in lst:
-            for i in li:
-                mean += i
-                items += i
-        return mean, items
+	def __len__(self):
+		return self.n
 
-    @staticmethod
-    def SST_cal(data, overall_mean):
-        SST = 0
-        for lst in data:
-            lst_mean = 0
-            ni = len(lst)  # Number of observations of ith group
-            for i in lst:
-                lst_mean += i
-            lst_mean /= ni
-            tmp = lst_mean - overall_mean
-            tmp = ni * (tmp ** 2)
-            SST += tmp
-        return SST
+	def __str__(self):
+		return f"The ANOVA returned an F value of {self.F}"
 
-    @staticmethod
-    def SSE_cal(data):
-        SSE = 0
-        for lst in data:
-            lst_mean = 0
-            ni = len(lst)
-            for i in lst:
-                lst_mean += i
-            lst_mean /= ni
+	def __float__(self):
+		return self.F
 
-            SDi = 0  # Standard Deviation for ith group
-            for i in lst:
-                x = (i - lst_mean) ** 2
-                SDi += x
-            SDi = SDi / (len(lst) - 1)
-            SDi = abs(SDi)  # When finding the sample standard deviation, the final step is to take the square root, but for the formula we immediately square it, so taking the absolute value is a shortcut
+	def __int__(self):
+		return int(self.F)
 
-            tmp = SDi * (ni - 1)
-            SSE += tmp
-        return SSE
+	def __call__(self, *args, **kwargs):
+		return float(self)
 
-    def __len__(self):
-        return self.length
+	@property
+	def n(self) -> int:
+		"""Total number of items"""
+		return self._n
 
-    def __str__(self):
-        return f"The ANOVA returned an F value of {self.F}"
+	@n.setter
+	def n(self, n:int):
+		if not isinstance(n, int):
+			n = int(n)
+		self._n = n
 
-    def __float__(self):
-        return self.F
-
-    def __int__(self):
-        return int(self.F)
-
-    @classmethod
-    def create(cls):
-        k = int(input("How many groups are there? "))  # Number of groups
-        n = 0  # Total number of observations
-        data = []
-        for i in range(k):
-            tmp = []
-            observ = 1
-            while observ != 'q':
-                observ = input(f"What is the data for group {i}? If completed with the group, eneter 'q'. ")
-                if observ != 'q':
-                    tmp.append(float(observ))
-                    n += 1
-                else:
-                    data.append(tmp)
-                    print("\n")
-        return cls(k, n, data)
+	@classmethod
+	def create(cls):
+		k = int(input("How many k are there? "))  # Number of k
+		n = 0  # Total number of observations
+		data = []
+		for i in range(k):
+			tmp = []
+			observ = 1
+			while observ != 'q':
+				observ = input(f"What is the data for group {i}? If completed with the group, enter 'q'. ")
+				if observ != 'q':
+					tmp.append(float(observ))
+					n += 1
+				else:
+					data.append(StatList(tmp))
+					print("\n")
+		return cls(k, n, data)
 
 
 if __name__ == "__main__":
-    anova = ANOVA.create()
+	anova = ANOVA.create()

@@ -30,21 +30,22 @@ class Residual(object):
 
 	@property
 	def sse(self) -> Fraction:
-		return sum([(yi - self.prediction.y_intercept - (self.prediction.slope*xi))**2 for xi, yi in zip(self.x, self.y)], start=Fraction(0))
+		# return sum([(yi - self.prediction.y_intercept - (self.prediction.slope*xi))**2 for xi, yi in zip(self.x, self.y)], start=Fraction(0))
+		return sum([(yi - self.prediction.predict(xi))**2 for xi, yi in zip(self.x, self.y)], start=Fraction(0))
 
 	def _diff_sum(self) -> Fraction:
 		"""
 		:rtype: float
 		:return: The difference of sums between the actual dependent variables and the predicted variables
 		"""
-		sum = Fraction(0)
+		diff_sum = Fraction(0)
 		predictions = [self.prediction.predict(x) for x in self.x]
 		self._residuals = [None] * len(self)
 		for (y, predict) in zip(self.y, predictions):
 			point = Fraction(y) - Fraction(predict)
-			sum += point
+			diff_sum += point
 			self.residuals.append(point)
-		return sum
+		return diff_sum
 
 	@property
 	def residuals(self):

@@ -83,7 +83,7 @@ def graph(df:pd.DataFrame, x_column:str, y_column:str, x_unit:str="", y_unit:str
 	:param str legend_loc: The location of the legend on the graph. Check matplotlib's documentation for what the possible values are.
 	:param str groupby: The column in the dataframe that should be used to group data points by color
 	:param dict or list group_colors: The collection of colors each group should use. If not provided, the system will automatically generate them using colors from Google Sheets.
-	:param str groupby_unit: The unit of the groups
+	:param str groupby_unit: The unit of the k
 	:param np.ndarray xticks: The ticks along the x-axis
 	:param np.ndarray yticks: The ticks along the y-axis
 	:param tuple xlim: The lower and upper limits of the x-axis, even if xticks extends beyond these values, they will be cut off.
