@@ -57,3 +57,13 @@ class TestFraction(TestCase):
 		frac1 = Fraction(1, 6)
 		frac1 *= 6
 		self.assertEqual(frac1, Fraction(1, 1))
+
+	def test_persistance(self):
+		frac1 = Fraction(0, 18, persistent_denominator=True)
+		frac2 = Fraction(1, 10)
+
+		frac1 *= frac2
+
+		self.assertEqual(frac1.numerator, 0)
+		self.assertEqual(frac1.denominator, 180)
+

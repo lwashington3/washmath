@@ -83,14 +83,21 @@ class Number:
 		number._upper_pow = self._upper_pow
 		number._lower_pow = self._lower_pow
 		return number
-	# endregion
+
+
+# endregion
 
 
 class Fraction(object):
 	REGEX = r"([0-9]+.?[0-9]+)\s?/\s?([0-9]+.?[0-9]+)"
 
-	def __init__(self, numerator, denominator=1):
+	def __init__(self, numerator, denominator=1, **kwargs):
+		"""
+		:param bool persistent_denominator: If the denominator should be kept as is if the numerator is 0. Default is False.
+		"""
 		self._allowed_to_reduce = False
+		self._persistent_denominator = kwargs.get("persistent_denominator", False)
+
 		if isinstance(denominator, Fraction):
 			self.numerator = numerator * denominator.denominator
 		else:
@@ -104,7 +111,7 @@ class Fraction(object):
 	# region Operator Overloads
 	def __add__(self, other):
 		if isinstance(other, Fraction):
-			if(self.denominator == other.denominator):
+			if (self.denominator == other.denominator):
 				return Fraction(self.numerator + other.numerator, self.denominator)
 			else:
 				newDenominator = self.denominator * other.denominator
@@ -117,7 +124,7 @@ class Fraction(object):
 
 	def __iadd__(self, other):
 		if isinstance(other, Fraction):
-			if(self.denominator == other.denominator):
+			if (self.denominator == other.denominator):
 				self.numerator += other.numerator
 			else:
 				self.numerator = (self.numerator * other.denominator) + (other.numerator * self.denominator)
@@ -129,7 +136,7 @@ class Fraction(object):
 
 	def __sub__(self, other):
 		if isinstance(other, Fraction):
-			if(self.denominator == other.denominator):
+			if (self.denominator == other.denominator):
 				return Fraction(self.numerator - other.numerator, self.denominator)
 			else:
 				newDenominator = self.denominator * other.denominator
@@ -142,7 +149,7 @@ class Fraction(object):
 
 	def __isub__(self, other):
 		if isinstance(other, Fraction):
-			if(self.denominator == other.denominator):
+			if (self.denominator == other.denominator):
 				self.numerator -= other.numerator
 			else:
 				newDenominator = lcm(self.denominator, other.denominator)
@@ -161,7 +168,9 @@ class Fraction(object):
 
 	def __imul__(self, other):
 		if isinstance(other, Fraction):
+			self._allowed_to_reduce = False
 			self.numerator *= other.numerator
+			self._allowed_to_reduce = True
 			self.denominator *= other.denominator
 		elif isinstance(other, (int, float)):
 			self.numerator *= other
@@ -240,7 +249,8 @@ class Fraction(object):
 
 	def __str__(self):
 		return repr(self)
-		# return f"{self.numerator:,}/{self.denominator:,}"
+
+	# return f"{self.numerator:,}/{self.denominator:,}"
 
 	def __repr__(self):
 		if self.numerator == 0:
@@ -319,11 +329,8 @@ class Fraction(object):
 
 	def __round__(self, ndigits=0):
 		return round(float(self), ndigits)
-	# endregion
 
-	@staticmethod
-	def equals(num:float) -> bool:
-		return int(num) == num
+	# endregion
 
 	@property
 	def numerator(self):
@@ -339,7 +346,7 @@ class Fraction(object):
 
 		if isinstance(numerator, (int, float)):
 			self._numerator = numerator
-			# numerator = Number(int)
+		# numerator = Number(int)
 		if isinstance(numerator, Fraction):
 			self._denominator = numerator.denominator * (self.denominator if hasattr(self, "_denominator") else 1)
 			self._numerator = numerator.numerator
@@ -368,7 +375,7 @@ class Fraction(object):
 
 		if isinstance(denominator, (int, float)):
 			self._denominator = denominator
-			# denominator = Number(denominator)
+		# denominator = Number(denominator)
 		if isinstance(denominator, Fraction):
 			self._numerator *= denominator.denominator
 			self._denominator = denominator.numerator
@@ -382,11 +389,14 @@ class Fraction(object):
 		return Fraction(self.numerator, self.denominator)
 
 	def reduce(self):
+		def equals(num: float) -> bool:
+			return int(num) == num
+
 		if not self._allowed_to_reduce:
 			return
-		if self.equals(self.numerator):
+		if equals(self.numerator):
 			self._numerator = int(self._numerator)
-		if self.equals(self.denominator):
+		if equals(self.denominator):
 			self._denominator = int(self._denominator)
 
 		while self.numerator % 1 != 0:
@@ -397,15 +407,15 @@ class Fraction(object):
 			self._numerator *= 10
 			self._denominator *= 10
 
-		if self.equals(self.numerator):
+		if equals(self.numerator):
 			self._numerator = int(self.numerator)
 
-		if self.equals(self.denominator):
+		if equals(self.denominator):
 			self._denominator = int(self.denominator)
 
 		try:
 			factor = gcd(int(self.numerator), int(self.denominator))
-			if factor != 1 and factor != 0:
+			if (factor != 1 and factor != 0) and (self._numerator != 0 or self._persistent_denominator):
 				self._numerator /= factor
 				self._denominator /= factor
 		except UFuncTypeError as e:
