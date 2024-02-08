@@ -151,6 +151,7 @@ class Fraction(object):
 		elif isinstance(other, (int, float)):
 			newNumerator = other * self.denominator
 			self.numerator -= newNumerator
+		return self
 
 	def __mul__(self, other):
 		if isinstance(other, Fraction):
@@ -164,6 +165,7 @@ class Fraction(object):
 			self.denominator *= other.denominator
 		elif isinstance(other, (int, float)):
 			self.numerator *= other
+		return self
 
 	def __truediv__(self, other):
 		if isinstance(other, Fraction):
@@ -182,6 +184,7 @@ class Fraction(object):
 				self.numerator /= other
 			else:
 				self.denominator *= other
+		return self
 
 	def __pow__(self, power, modulo=None):
 		if power == 0:
@@ -278,8 +281,9 @@ class Fraction(object):
 		return float(self) > other
 
 	def __eq__(self, other):
+		if other is None: return False
 		if isinstance(other, int):
-			return float(self) == other
+			return int(self) == other
 		elif isinstance(other, Fraction):
 			if self.denominator == other.denominator:
 				return self.numerator == other.numerator
@@ -291,7 +295,6 @@ class Fraction(object):
 		elif isinstance(other, bool):
 			return bool(self) == other
 		return float(self) == other
-
 
 	def __le__(self, other):
 		return (self < other) or (self == other)
@@ -410,6 +413,7 @@ class Fraction(object):
 
 		return self
 
+	@property
 	def is_whole(self) -> bool:
 		"""Returns whether the fraction is a whole number or not"""
 		return self.denominator == 1

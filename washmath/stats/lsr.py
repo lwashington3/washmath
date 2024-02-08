@@ -80,12 +80,14 @@ class Least_Squares_Regression(object):
 		"""
 		return self._b0
 
-	def predict(self, x) -> float:
+	def predict(self, x, use_float=False) -> float:
 		"""
 		A function that gets a predicted point based on a given dependent variable. 0 would return the y-intercept
 		:param float x: The x value that you want to get a prediction for
 		:return: The predicted y value based on the equation
 		"""
+		if use_float:
+			return float(self.slope) * x + float(self.y_intercept)
 		return self.slope * x + self.y_intercept
 
 	def inverse(self, y) -> float:

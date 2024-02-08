@@ -264,8 +264,8 @@ class StatList(list):
 
 	def __setitem__(self, key, value):
 		if not self.allow_fractions:
-			if isinstance(__value, object):
-				__value = float(__value)
+			if isinstance(value, object):
+				__value = float(value)
 		super().__setitem__(key, value)
 
 	def _check_if_containing_fractions(self) -> bool:
@@ -354,11 +354,16 @@ class StatList(list):
 	def _setMode(self):
 		mode = None
 		times = 0
-		for unique_value in set(self):
-			count = super().count(unique_value)
-			if count > times:
-				mode = unique_value
-				times = count
+
+		try:
+			for unique_value in set(self):
+				count = super().count(unique_value)
+				if count > times:
+					mode = unique_value
+					times = count
+		except np.core._exceptions.UFuncTypeError as e:
+			from warnings import warn
+			warn(f"The most could not be calculated due to: {e}")
 
 		self._mode = mode
 
