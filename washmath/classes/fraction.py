@@ -91,11 +91,13 @@ class Number:
 class Fraction(object):
 	REGEX = r"([0-9]+.?[0-9]+)\s?/\s?([0-9]+.?[0-9]+)"
 
-	def __init__(self, numerator, denominator=1, **kwargs):
+	def __init__(self, numerator, denominator=1, auto_reduce=True, **kwargs):
 		"""
 		:param bool persistent_denominator: If the denominator should be kept as is if the numerator is 0. Default is False.
+		:param bool auto_reduce: If the fraction should be automatically reduced.
 		"""
 		self._allowed_to_reduce = False
+		self.auto_reduce = auto_reduce
 		self._persistent_denominator = kwargs.get("persistent_denominator", False)
 
 		if isinstance(denominator, Fraction):
@@ -352,7 +354,8 @@ class Fraction(object):
 			self._numerator = numerator.numerator
 		elif isinstance(numerator, Number):
 			self._numerator = numerator
-		self.reduce()
+		if self.auto_reduce:
+			self.reduce()
 
 	@property
 	def denominator(self):
@@ -383,10 +386,11 @@ class Fraction(object):
 			whole_denominator = denominator ** denominator.get_radical
 			self._numerator *= denominator
 			self._denominator = whole_denominator
-		self.reduce()
+		if self.auto_reduce:
+			self.reduce()
 
 	def copy(self):
-		return Fraction(self.numerator, self.denominator)
+		return Fraction(self.numerator, self.denominator, auto_reduce=self.auto_reduce)
 
 	def reduce(self):
 		def equals(num: float) -> bool:
@@ -394,24 +398,10 @@ class Fraction(object):
 
 		if not self._allowed_to_reduce:
 			return
-		if equals(self.numerator):
-			self._numerator = int(self._numerator)
-		if equals(self.denominator):
-			self._denominator = int(self._denominator)
 
-		while self.numerator % 1 != 0:
+		while self.numerator % 1 != 0 or self.denominator % 1 != 0:
 			self._numerator *= 10
 			self._denominator *= 10
-
-		while self.denominator % 1 != 0:
-			self._numerator *= 10
-			self._denominator *= 10
-
-		if equals(self.numerator):
-			self._numerator = int(self.numerator)
-
-		if equals(self.denominator):
-			self._denominator = int(self.denominator)
 
 		try:
 			factor = gcd(int(self.numerator), int(self.denominator))
@@ -420,6 +410,12 @@ class Fraction(object):
 				self._denominator /= factor
 		except UFuncTypeError as e:
 			warn(str(e))
+
+		if equals(self.numerator):
+			self._numerator = int(self.numerator)
+
+		if equals(self.denominator):
+			self._denominator = int(self.denominator)
 
 		return self
 
