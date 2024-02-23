@@ -107,7 +107,7 @@ class Fraction(object):
 		self._allowed_to_reduce = True
 		if hasattr(self, "_denominator"):
 			try:
-				self.denominator *= denominator  # The numerator was a fraction, and the new denominator needs to be multiplied by the old one.
+				self.denominator *= denominator.denominator  # The numerator was a fraction, and the new denominator needs to be multiplied by the old one.
 			except TypeError as e:
 				self.denominator = denominator * self._denominator
 		else:
@@ -117,12 +117,12 @@ class Fraction(object):
 	def __add__(self, other):
 		if isinstance(other, Fraction):
 			if (self.denominator == other.denominator):
-				return Fraction(self.numerator + other.numerator, self.denominator)
+				return Fraction(self.numerator + other.numerator, self.denominator, auto_reduce=self.auto_reduce)
 			else:
 				newDenominator = self.denominator * other.denominator
 				newSelf = self.numerator * other.denominator
 				newOther = other.numerator * self.denominator
-				return Fraction(newSelf + newOther, newDenominator)  # Now they have matching denominators
+				return Fraction(newSelf + newOther, newDenominator, auto_reduce=self.auto_reduce)  # Now they have matching denominators
 		elif isinstance(other, (int, float)):
 			newNumerator = other * self.denominator
 			return Fraction(newNumerator + self.numerator, self.denominator)
@@ -167,9 +167,9 @@ class Fraction(object):
 
 	def __mul__(self, other):
 		if isinstance(other, Fraction):
-			return Fraction(self.numerator * other.numerator, self.denominator * other.denominator)
+			return Fraction(self.numerator * other.numerator, self.denominator * other.denominator, auto_reduce=self.auto_reduce)
 		elif isinstance(other, (int, float)):
-			return Fraction(self.numerator * other, self.denominator)
+			return Fraction(self.numerator * other, self.denominator, self.auto_reduce)
 
 	def __imul__(self, other):
 		if isinstance(other, Fraction):
@@ -426,6 +426,13 @@ class Fraction(object):
 	def is_whole(self) -> bool:
 		"""Returns whether the fraction is a whole number or not"""
 		return self.denominator == 1
+
+	def __invert__(self):
+		return self.inverse
+
+	@property
+	def inverse(self):
+		return Fraction(self.denominator, self.numerator)
 
 
 if __name__ == "__main__":
