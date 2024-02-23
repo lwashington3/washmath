@@ -106,7 +106,10 @@ class Fraction(object):
 			self.numerator = numerator
 		self._allowed_to_reduce = True
 		if hasattr(self, "_denominator"):
-			self.denominator *= denominator  # The numerator was a fraction, and the new denominator needs to be multiplied by the old one.
+			try:
+				self.denominator *= denominator  # The numerator was a fraction, and the new denominator needs to be multiplied by the old one.
+			except TypeError as e:
+				self.denominator = denominator * self._denominator
 		else:
 			self.denominator = denominator
 

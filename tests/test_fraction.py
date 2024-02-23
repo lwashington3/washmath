@@ -67,3 +67,16 @@ class TestFraction(TestCase):
 		self.assertEqual(frac1.numerator, 0)
 		self.assertEqual(frac1.denominator, 180)
 
+	def test_initialization(self):
+		frac1 = Fraction(1, 2)
+		frac2 = Fraction(frac1, 3)
+
+		self.assertEqual(frac2.numerator, 1)
+		self.assertEqual(frac2.denominator, 6)
+
+		frac1 = Fraction(1, 2)
+		frac2 = Fraction(1, 1)
+		frac3 = Fraction(frac1, frac2)
+
+		self.assertEqual(frac3.numerator, 1)
+		self.assertEqual(frac3.denominator, 2)
