@@ -434,6 +434,10 @@ class Fraction(object):
 	def inverse(self):
 		return Fraction(self.denominator, self.numerator)
 
+	@property
+	def to_tex(self) -> str:
+		return f"\\frac{{{self.numerator:,}}}{{{self.denominator:,}}}"
+
 
 if __name__ == "__main__":
 	frac = Fraction(1, 2)
